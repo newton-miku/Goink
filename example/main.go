@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/newton-miku/Goink"
@@ -18,5 +17,5 @@ func main() {
 			fmt.Fprintf(w, "Header[%q] = %q\n", k, v)
 		}
 	})
-	log.Fatal(http.ListenAndServe(":9999", engine))
+	engine.Run(":9999")
 }
