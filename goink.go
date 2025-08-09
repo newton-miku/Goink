@@ -1,27 +1,25 @@
-package Goink
+package goink
 
 import (
 	"net/http"
 )
 
-type HandlerFunc func(w http.ResponseWriter, r *http.Request)
+// 声明HandlerFunc 函数及其参数
+type HandlerFunc func(*Context)
 
 type Engine struct {
-	router map[string]HandlerFunc
+	// 路由
+	router *Router
 }
 
 func (e *Engine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	key := r.Method + "-" + r.URL.Path
-	if handler, ok := e.router[key]; ok {
-		handler(w, r)
-	} else {
-		http.NotFound(w, r)
-	}
+	c := newContext(w, r)
+	e.router.handler(c)
 }
 
 func (e *Engine) AddRoute(method, path string, handler HandlerFunc) {
-	key := method + "-" + path
-	e.router[key] = handler
+	// 调用Router中的addRouter方法
+	e.router.addRouter(method, path, handler)
 }
 
 func (e *Engine) GET(path string, handler HandlerFunc) {
@@ -49,5 +47,7 @@ func (e *Engine) Run(addr string) (err error) {
 }
 
 func New() *Engine {
-	return &Engine{router: make(map[string]HandlerFunc)}
+	return &Engine{
+		router: newRouter(),
+	}
 }
